@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>All Employees</h2>
+  <table border="1">
+    <tr>
+      <th>Emp No</th>
+      <th>Name</th>
+      <th>CPR</th>
+      <th>Phone</th>
+      <th>Section</th>
+      <th>Position</th>
+      <th>Store</th>
+    </tr>
+    {% for emp in employees %}
+    <tr>
+      <td>{{ emp.employee_no }}</td>
+      <td>{{ emp.employee_name }}</td>
+      <td>{{ emp.cpr }}</td>
+      <td>{{ emp.phone1 }}</td>
+      <td>{{ emp.section }}</td>
+      <td>{{ emp.position }}</td>
+      <td>{{ emp.store|default:"-" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
+
