@@ -10,6 +10,7 @@
     <th>Section</th>
     <th>Position</th>
     <th>Store</th>
+    <th>Image</th>
     <th>Status</th>
     <th>Actions</th>
   </tr>
@@ -24,6 +25,23 @@
     <td>{{ emp.section }}</td>
     <td>{{ emp.position }}</td>
     <td>{{ emp.store|default:"-" }}</td>
+    <td>
+      {% if emp.image %}
+      <a href="{{ emp.image.url }}" target="_blank">
+        <img
+          src="{{ emp.image.url }}"
+          alt="Photo"
+          width="60"
+          height="60"
+          style="object-fit: cover; border-radius: 50%; border: 1px solid #ccc;"
+
+        />
+      </a>
+      {% else %}
+      <em>No Image</em>
+      {% endif %}
+    </td>
+
     <td>
       {% if emp.is_active %}
       <span style="color: green; font-weight: bold">Active</span>

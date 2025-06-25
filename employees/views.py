@@ -11,11 +11,11 @@ def add_employee(request):
             return redirect('list_employee')
     else:
         form = EmployeeForm()
-    return render(request, 'employees/employee_form.html', {'form': form})
+    return render(request, 'employees/employee_form.html', {'form': form, 'title': 'Add Employee'})
 
 def employee_list(request):
     # employees = Employee.objects.filter(is_active=True)
-    employees = Employee.objects.all
+    employees = Employee.objects.all()
     return render(request, 'employees/employee_list.html', {'employees':employees})
 
 def edit_employee(request, pk):
@@ -27,7 +27,7 @@ def edit_employee(request, pk):
             return redirect('list_employee')
     else:
         form = EmployeeForm(instance=employee)
-    return render(request, 'employees/employee_form.html',{'form': form, 'edit':True})
+    return render(request, 'employees/employee_form.html',{'form': form, 'title': 'Edit Employee'})
 
 # def delete_employee(request,pk):
 #     employee = get_object_or_404(Employee,pk=pk)
