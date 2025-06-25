@@ -1,0 +1,45 @@
+{% load static %}
+<html>
+  <head>
+    <title>Search Employee</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <div class="form-container">
+      <h1 class="form-title">Search Employee by Number</h1>
+
+      <div class="search-form">
+        <form method="GET">
+          <input type="text" name="emp_num" placeholder="Enter Employee Number" />
+          <button type="submit">Search</button>
+          <a href="{% url 'employee_search' %}" class="clear-button">Clear</a>
+        </form>
+      </div>
+
+      {% if searched %}
+        {% if result %}
+          <div class="employee-card">
+            <div class="employee-details">
+              <h3 class="details-title">Employee Details</h3>
+              <p><strong>Employee No:</strong> {{ result.employee_no }}</p>
+              <p><strong>Name:</strong> {{ result.employee_name }}</p>
+              <p><strong>CPR:</strong> {{ result.cpr }}</p>
+              <p><strong>Phone 1:</strong> {{ result.phone1 }}</p>
+              <p><strong>Phone 2:</strong> {{ result.phone2 }}</p>
+              <p><strong>Nationality:</strong> {{ result.nationality }}</p>
+              <p><strong>Joining Date:</strong> {{ result.joining_date }}</p>
+              <p><strong>Promotion Date:</strong> {{ result.last_promotion_date }}</p>
+            </div>
+            <div class="employee-photo">
+              {% if result.image %}
+                <img src="{{ result.image.url }}" alt="Employee Photo">
+              {% endif %}
+            </div>
+          </div>
+        {% else %}
+          <p class="no-result">No employee found with that number.</p>
+        {% endif %}
+      {% endif %}
+    </div>
+  </body>
+</html>

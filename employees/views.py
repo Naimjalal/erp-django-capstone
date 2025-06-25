@@ -27,7 +27,8 @@ def edit_employee(request, pk):
             return redirect('list_employee')
     else:
         form = EmployeeForm(instance=employee)
-    return render(request, 'employees/employee_form.html',{'form': form, 'title': 'Edit Employee'})
+    return render(request, 'employees/employee_form.html',{'form': form, 'title': 'Edit Employee',
+    'edit': True})
 
 # def delete_employee(request,pk):
 #     employee = get_object_or_404(Employee,pk=pk)
@@ -50,5 +51,20 @@ def reactivate_employee(request, pk):
     employee.is_active = True
     employee.save()
     return redirect('inactive_employees')
+
+def employee_search(request):
+    searched = False
+    result = None
+    query = request.GET.get('emp_num')
+    if query:
+        searched = True
+        try:
+            result = Employee.objects.get(employee_no__icontains=query)
+        except Employee.DoesNotExist:
+            result = None
+    return render(request, 'employees/employee_search.html', {'result': result, 'searched': searched})
+
+
+
 
 

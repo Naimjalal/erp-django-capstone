@@ -8,6 +8,7 @@ urlpatterns = [
     path('deactivate/<int:pk>/', views.deactivate_employee, name='deactivate_employee'),
     path('inactive/', views.inactive_employees, name='inactive_employees'),
     path('reactivate/<int:pk>/', views.reactivate_employee, name='reactivate_employee'),
+    path('search/', views.employee_search, name='employee_search'),
 
 
 
