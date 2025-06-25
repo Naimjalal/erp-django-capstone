@@ -1,35 +1,49 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<h2>All Employees</h2>
+<table border="1">
+  <tr>
+    <th>#</th>
+    <th>Emp No</th>
+    <th>Name</th>
+    <th>CPR</th>
+    <th>Phone</th>
+    <th>Section</th>
+    <th>Position</th>
+    <th>Store</th>
+    <th>Status</th>
+    <th>Actions</th>
+  </tr>
 
-{% block content %}
-  <h2>All Employees</h2>
-  <table border="1">
-    <tr>
-      <th>#</th>
-      <th>Emp No</th>
-      <th>Name</th>
-      <th>CPR</th>
-      <th>Phone</th>
-      <th>Section</th>
-      <th>Position</th>
-      <th>Store</th>
-    </tr>
-    {% for emp in employees %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ emp.employee_no }}</td>
-      <td>{{ emp.employee_name }}</td>
-      <td>{{ emp.cpr }}</td>
-      <td>{{ emp.phone1 }}</td>
-      <td>{{ emp.section }}</td>
-      <td>{{ emp.position }}</td>
-      <td>{{ emp.store|default:"-" }}</td>
-      <td>
-        <a href="{% url 'edit_employee' emp.id %}">Edit</a> |
-        <a href="{% url 'deactivate_employee' emp.id %}" onclick="return confirm('Are you sure you want to deactivate this employee?');">Deactivate</a>
-      </td>
-
-    </tr>
-    {% endfor %}
-  </table>
+  {% for emp in employees %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ emp.employee_no }}</td>
+    <td>{{ emp.employee_name }}</td>
+    <td>{{ emp.cpr }}</td>
+    <td>{{ emp.phone1 }}</td>
+    <td>{{ emp.section }}</td>
+    <td>{{ emp.position }}</td>
+    <td>{{ emp.store|default:"-" }}</td>
+    <td>
+      {% if emp.is_active %}
+      <span style="color: green; font-weight: bold">Active</span>
+      {% else %}
+      <span style="color: red; font-weight: bold">Inactive</span>
+      {% endif %}
+    </td>
+    <td>
+      {% if emp.is_active %}
+      <a href="{% url 'edit_employee' emp.id %}">Edit</a> |
+      <a
+        href="{% url 'deactivate_employee' emp.id %}"
+        onclick="return confirm('Are you sure you want to deactivate this employee?');"
+        >Deactivate</a
+      >
+      {% else %}
+      <em style="color: gray">No actions</em>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
 {% endblock %}
-

@@ -14,7 +14,8 @@ def add_employee(request):
     return render(request, 'employees/employee_form.html', {'form': form})
 
 def employee_list(request):
-    employees = Employee.objects.filter(is_active=True)
+    # employees = Employee.objects.filter(is_active=True)
+    employees = Employee.objects.all
     return render(request, 'employees/employee_list.html', {'employees':employees})
 
 def edit_employee(request, pk):
