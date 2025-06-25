@@ -38,6 +38,7 @@ class Employee(models.Model):
     joining_date = models.DateField()
     last_promotion_date =models.DateField(blank=True, null=True)
     image= models.ImageField(upload_to='employee_images/', blank=True,null =True)
+    is_active = models.BooleanField(default=True)
 
     position = models.ForeignKey('Position', on_delete=models.SET_NULL, null = True)
     designation = models.ForeignKey('Designation', on_delete=models.SET_NULL, null=True)

@@ -10,6 +10,9 @@
         <a href="{% url 'home' %}">Home</a> |
         <a href="{% url 'add_employee' %}">Add Employee</a> |
         <a href="{% url 'list_employee' %}">Employee List</a>
+        {% if user.is_staff %}
+    | <a href="{% url 'inactive_employees' %}">Inactive Employees</a>
+  {% endif %}
     </nav>
     <hr>
 
