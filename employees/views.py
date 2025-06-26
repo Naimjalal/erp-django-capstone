@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Employee
+from .models import Employee , Section
 from .forms import EmployeeForm
 # Create your views here.
 
@@ -64,6 +64,20 @@ def employee_search(request):
             result = None
     return render(request, 'employees/employee_search.html', {'result': result, 'searched': searched})
 
+
+def employee_list(request):
+    section_id = request.GET.get('section')
+    employees = Employee.objects.all()
+
+    if section_id:
+        employees = employees.filter(section_id = section_id )
+    
+    sections = Section.objects.all()
+    return render(request,'employees/employee_list.html',{
+        'employees': employees,
+        'sections': sections,
+        'selected_section': section_id,
+    })
 
 
 

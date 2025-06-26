@@ -1,5 +1,19 @@
 {% extends 'base.html' %} {% block content %}
 <h2>All Employees</h2>
+
+<form method="get">
+  <label for="section">Filter by Section:</label>
+  <select name="section" id="section" onchange="this.form.submit()">
+    <option value="">All Sections</option>
+    {% for section in sections %}
+      <option value="{{ section.id }}" {% if section.id|stringformat:"s" == request.GET.section %}selected{% endif %}>
+        {{ section.section_name }}
+      </option>
+    {% endfor %}
+  </select>
+</form>
+
+
 <table border="1">
   <tr>
     <th>#</th>
