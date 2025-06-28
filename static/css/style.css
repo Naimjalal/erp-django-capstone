@@ -220,3 +220,8 @@ nav a {
 nav a:hover {
   color: #007bff;
 }
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
+}

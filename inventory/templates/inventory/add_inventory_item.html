@@ -1,12 +1,62 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-  <h2>Add Inventory Item</h2>
+<link rel="stylesheet" href="{% static 'inventory/css/inventory.css' %}" />
 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
+<h2>Add Inventory Item</h2>
 
-    <button type="submit">Add Item</button>
-  </form>
+<div class="inventory-wrapper">
+  <!-- FORM SIDE -->
+  <div class="inventory-form">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Add Item</button>
+    </form>
+  </div>
+
+  <!-- TABLE SIDE -->
+  <div class="inventory-table">
+    <h3>Inventory Items</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Unit</th>
+          <th>Returnable</th>
+          <th>Expiry</th>
+          <th>Image</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ item.item_name }}</td>
+          <td>{{ item.category.category_name }}</td>
+          <td>{{ item.unit }}</td>
+          <td>{{ item.is_returnable|yesno:"✅,❌" }}</td>
+          <td>{{ item.has_expiry|yesno:"✅,❌" }}</td>
+          <td>
+            {% if item.image %}
+              <img src="{{ item.image.url }}" width="50" />
+            {% else %}
+              N/A
+            {% endif %}
+          </td>
+          <td class="actions">
+            <a href="{% url 'edit_inventory_item' item.id %}">Edit</a>
+            <a href="{% url 'delete_inventory_item' item.id %}">Delete</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7">No items found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
