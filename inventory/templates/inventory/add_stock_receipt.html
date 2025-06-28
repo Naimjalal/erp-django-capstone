@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Add Stock Receipt</h2>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <!-- 🧾 General Stock Receipt Info -->
+  <label><strong>Receipt No:</strong></label>
+  <input type="text" name="receipt_no" required />
+
+  <label><strong>Store:</strong></label>
+  <select name="store" required>
+    {% for store in stores %}
+      <option value="{{ store.id }}">{{ store.store_name }}</option>
+    {% endfor %}
+  </select>
+
+  <label><strong>Received Date:</strong></label>
+  <input type="date" name="received_date" required />
+
+  <label><strong>Attachment:</strong></label>
+  <input type="file" name="attachment" />
+
+  <hr />
+
+  <!-- 📦 Received Items Table -->
+  <h3>Received Items</h3>
+  <table id="items-table">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Size Variant</th>
+        <th>Quantity</th>
+        <th>Unit</th>
+        <th>Expiry Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="items-body">
+      <!-- JavaScript will inject rows here -->
+    </tbody>
+  </table>
+
+  <button type="button" id="add-row">+ Add Item</button>
+  <br /><br />
+
+  <button type="submit">Submit Stock Receipt</button>
+</form>
+
+<!-- 📜 JavaScript for dynamic row handling -->
+<script>
+  const sizeVariants = {{ size_variant_data|safe }};
+
+  function createRow() {
+    const row = document.createElement('tr');
+
+    row.innerHTML = `
+      <td>
+        <select name="item[]" onchange="filterSizes(this)" required>
+          <option value="">-- Select Item --</option>
+          {% for item in items %}
+            <option value="{{ item.id }}">{{ item.item_name }}</option>
+          {% endfor %}
+        </select>
+      </td>
+
+      <td>
+        <select name="size_variant[]" disabled required>
+          <option value="">-- Select Size --</option>
+        </select>
+      </td>
+
+      <td><input type="number" name="quantity[]" min="1" required /></td>
+      <td><input type="text" name="unit[]" placeholder="pcs, box..." required /></td>
+      <td><input type="date" name="expiry_date[]" /></td>
+      <td><button type="button" onclick="removeRow(this)">🗑</button></td>
+    `;
+
+    document.getElementById('items-body').appendChild(row);
+  }
+
+  function filterSizes(itemSelect) {
+    const itemId = itemSelect.value;
+    const row = itemSelect.closest('tr');
+    const sizeSelect = row.querySelector('select[name="size_variant[]"]');
+
+    sizeSelect.innerHTML = '<option value="">-- Select Size --</option>';
+
+    if (itemId && sizeVariants[itemId]) {
+      sizeVariants[itemId].forEach(variant => {
+        const option = document.createElement('option');
+        option.value = variant.id;
+        option.textContent = variant.size_label;
+        sizeSelect.appendChild(option);
+      });
+      sizeSelect.disabled = false;
+    } else {
+      sizeSelect.disabled = true;
+    }
+  }
+
+  function removeRow(button) {
+    button.closest('tr').remove();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    createRow(); // Add the first row by default
+    document.getElementById('add-row').addEventListener('click', createRow);
+  });
+</script>
+
+{% endblock %}

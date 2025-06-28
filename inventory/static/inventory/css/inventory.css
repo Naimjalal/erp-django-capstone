@@ -46,3 +46,32 @@
 .inventory-form textarea {
   width: 100%;
 } */
+
+
+.size-variant-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.size-variant-form-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.size-variant-form-container button {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.size-variant-form-container button:hover {
+  background-color: #0056b3;
+}
