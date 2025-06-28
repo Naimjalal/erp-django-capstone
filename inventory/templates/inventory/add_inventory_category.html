@@ -1,0 +1,13 @@
+{%extends 'base.html'%}
+
+{% block content%}
+<h2>Add Inventory Category</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p}}
+
+  <button type="submit">Add Category</button>
+
+</form>
+{% endblock %}
