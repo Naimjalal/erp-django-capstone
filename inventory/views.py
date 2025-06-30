@@ -197,3 +197,10 @@ def receipt_detail(request, pk):
     })
 
 
+def delete_stock_receipt(request, pk):
+    receipt = get_object_or_404(StockReceipt, pk=pk)
+    if request.method == 'POST':
+        receipt.delete()
+        return redirect('stock_receipt_list')  # back to list after deletion
+
+    return render(request, 'inventory/confirm_delete_receipt.html', {'receipt': receipt})

@@ -11,10 +11,11 @@
       <th>Received Date</th>
       <th>Received By</th>
       <th>Attachment</th>
+      <th>Actions</th>
     </tr>
   </thead>
-  <tbody>
-    {% for receipt in receipts %}
+<tbody>
+  {% for receipt in receipts %}
     <tr onclick="window.location.href='{% url 'stock_receipt_detail' receipt.id %}'" style="cursor: pointer;">
       <td>{{ receipt.receipt_no }}</td>
       <td>{{ receipt.store.store_name }}</td>
@@ -22,13 +23,17 @@
       <td>{{ receipt.received_by.username }}</td>
       <td>
         {% if receipt.attachment %}
-          <a href="{{ receipt.attachment.url }}" target="_blank">View</a>
+          <a href="{{ receipt.attachment.url }}" target="_blank" onclick="event.stopPropagation();">View</a>
         {% else %}
           -
         {% endif %}
       </td>
+      <td>
+        <a href="{% url 'delete_stock_receipt' receipt.id %}" onclick="event.stopPropagation();">Delete</a>
+      </td>
     </tr>
-    {% endfor %}
-  </tbody>
+  {% endfor %}
+</tbody>
 </table>
+
 {% endblock %}

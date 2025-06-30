@@ -13,6 +13,8 @@ urlpatterns = [
     path('stock-receipts/', views.stock_receipt_list, name='stock_receipt_list'),
     path('receipts/<int:pk>/', views.receipt_detail, name='receipt_detail'),
     path('stock-receipt/<int:pk>/', views.receipt_detail, name='stock_receipt_detail'),
+    path('stock-receipt/delete/<int:pk>/', views.delete_stock_receipt, name='delete_stock_receipt'),
+
 
 
 
