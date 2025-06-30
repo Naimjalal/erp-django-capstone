@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>ERP System</title>
-  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+  {% load static %}
+
+   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
 </head>
 <body>
 
   <header>
     <nav>
       <a href="{% url 'home' %}">Home</a>
+      
       <a href="{% url 'add_employee' %}">Add Employee</a>
       <a href="{% url 'list_employee' %}">Employee List</a>
       {% if user.is_staff %}
@@ -34,7 +38,7 @@
 
   <footer>
     <p>© 2025 ERP System</p>
-  </footer>
+  </footer> 
 
 </body>
 </html>

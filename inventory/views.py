@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .forms import InventoryCategoryForm, InventoryItemForm, SizeVariantForm,StockReceiptForm, StockReceiptItemFormSet
-from .models import Inventory_Item,SizeVariant, StockReceipt, StockReceiptItem, Supplier
+from .models import Inventory_Item,SizeVariant, StockReceipt, StockReceiptItem, Supplier,Inventory_Category
 from collections import defaultdict
 from employees.models import Store
 from django.utils import timezone
@@ -109,9 +109,10 @@ def delete_size_variant(request, pk):
     return render(request, 'inventory/confirm_delete.html', {'object': size_variant})
 
 def add_stock_receipt(request):
-    items = Inventory_Item.objects.all()
+    items = Inventory_Item.objects.select_related('category').all()
     suppliers = Supplier.objects.all()
     stores = Store.objects.all()
+    categories = Inventory_Category.objects.all()
 
     if request.method == 'POST':
         receipt_no = request.POST.get('receipt_no')
@@ -153,7 +154,7 @@ def add_stock_receipt(request):
 
         return redirect('add_stock_receipt')  # Success
 
-    # GET request: prepare context and show form
+    # ===== Build size_variant data for JS (item_id -> variants)
     size_variant_data = defaultdict(list)
     for variant in SizeVariant.objects.select_related('item'):
         size_variant_data[variant.item.id].append({
@@ -161,11 +162,27 @@ def add_stock_receipt(request):
             'size_label': variant.size_label
         })
 
+    # ===== Build item data by category_id for JS (category_id -> [items])
+    item_data = defaultdict(list)
+    item_expiry_map = {item.id: item.has_expiry for item in items} 
+    for item in items:
+        item_data[item.category.id].append({
+            'id': item.id,
+            'name': item.item_name,
+            'has_expiry': item.has_expiry,
+            
+            
+
+        })
+
     context = {
         'items': items,
         'suppliers': suppliers,
         'stores': stores,
+        'categories': categories,
         'size_variant_data': json.dumps(size_variant_data),
+        'item_data': json.dumps(item_data),
+        'item_expiry_map': json.dumps(item_expiry_map),
     }
 
     return render(request, 'inventory/add_stock_receipt.html', context)

@@ -1,13 +1,70 @@
+/* === Global === */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-  padding: 40px;
+  background-color: #f0f2f5;
+  margin: 0;
+  padding: 0;
+  color: #333;
 }
 
+main {
+  padding: 40px 20px;
+  min-height: 70vh;
+}
+
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* === Header & Navigation === */
+header {
+  background-color: #0b5ed7;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 1rem;
+  gap: 12px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+nav a {
+  background-color: #ffffff;
+  color: #0b5ed7;
+  padding: 8px 14px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  border: 1px solid #0b5ed7;
+  transition: all 0.3s ease;
+  margin-right: 15px;
+}
+
+nav a:hover {
+  background-color: #e0e4ea;
+  color: #ffffff;
+}
+
+/* === Footer === */
+footer {
+  background-color: #0b5ed7;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  margin-top: 40px;
+}
+
+/* === Form Elements === */
 .form-container {
   background: white;
   max-width: 1000px;
-  margin: auto;
+  margin: 40px auto;
   padding: 30px 40px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -20,23 +77,6 @@ body {
   font-weight: bold;
 }
 
-.form-flex {
-  display: flex;
-  gap: 40px;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.form-left {
-  flex: 2;
-  min-width: 300px;
-}
-
-.form-right {
-  flex: 1;
-  min-width: 200px;
-}
-
 .form-group {
   margin-bottom: 20px;
 }
@@ -47,9 +87,9 @@ label {
   margin-bottom: 6px;
 }
 
-input[type="text"],
-input[type="date"],
-input[type="file"],
+input[type='text'],
+input[type='date'],
+input[type='file'],
 select,
 textarea {
   width: 100%;
@@ -58,58 +98,11 @@ textarea {
   border-radius: 5px;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   margin-top: 8px;
 }
 
-.form-help {
-  margin-top: 5px;
-  font-size: 12px;
-  color: gray;
-}
-
-.form-right label {
-  margin-bottom: 6px;
-  display: block;
-  font-weight: bold;
-}
-
-.form-right input[type="file"] {
-  margin-bottom: 10px;
-}
-
-.form-right .current-image-label {
-  margin-top: 15px;
-  font-weight: bold;
-  display: block;
-}
-
-img#preview,
-.form-right img {
-  display: block;
-  margin-top: 10px;
-  width: 100%;
-  max-width: 160px;
-  height: auto;
-  object-fit: cover;
-  border-radius: 8px; /* Use 50% if you want circular profile */
-  border: 1px solid #ccc;
-}
-
-/* Optional: Circular preview image (comment above and uncomment below for rounded) */
-/*
-img#preview,
-.form-right img {
-  border-radius: 50%;
-}
-*/
-
-.form-actions {
-  text-align: center;
-  margin-top: 30px;
-}
-
-button[type="submit"] {
+button[type='submit'] {
   background-color: #007bff;
   color: white;
   padding: 10px 25px;
@@ -120,30 +113,327 @@ button[type="submit"] {
   transition: background 0.3s;
 }
 
-button[type="submit"]:hover {
+button[type='submit']:hover {
   background-color: #0056b3;
 }
 
-/* Responsive layout for smaller screens */
-@media (max-width: 768px) {
-  .form-flex {
-    flex-direction: column;
-  }
-
-  .form-left,
-  .form-right {
-    width: 100%;
-  }
-
-  img#preview,
-  .form-right img {
-    margin-left: auto;
-    margin-right: auto;
-  }
+/* === Homepage Message === */
+.homepage-message {
+  background-color: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  margin: 50px auto;
+  max-width: 800px;
+  text-align: left;
 }
 
-/* for employee search */
+.homepage-message h2 {
+  color: #004080;
+  font-size: 28px;
+  margin-bottom: 15px;
+}
 
+/* === Inventory Page === */
+.inventory-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  max-width: 1300px;
+}
+
+.inventory-form {
+  flex: 1;
+  min-width: 300px;
+  background-color: #ffffff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.inventory-form h2 {
+  text-align: center;
+  color: #0b5ed7;
+  margin-bottom: 20px;
+  font-size: 24px;
+ 
+}
+
+.inventory-form label {
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.inventory-form input,
+.inventory-form select,
+.inventory-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+}
+
+.inventory-form input[type="checkbox"] {
+  width: auto;
+  margin-right: 10px;
+}
+
+.inventory-form button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.inventory-form button:hover {
+  background-color: #0056b3;
+}
+
+/* === Inventory Table Improved === */
+.inventory-table {
+  flex: 2;
+  min-width: 500px;
+  overflow-x: auto;
+}
+
+.inventory-table h3 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  text-align: center;
+  color: #0b5ed7;
+}
+
+.inventory-table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ccc;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  font-size: 14px;
+  vertical-align: middle;
+  border: 1px solid #ccc;
+}
+.inventory-table th:last-child,
+.inventory-table td:last-child {
+  border-right: none;
+}
+
+.inventory-table th {
+  background-color: #0b5ed7;
+  color: white;
+  font-weight: bold;
+}
+
+.inventory-table td img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  display: block;
+  margin: 0 auto;
+}
+
+/* ✅ ❌ styling */
+.inventory-table td {
+  font-size: 16px;
+}
+
+.inventory-table td:has(img),
+.inventory-table td:has(a) {
+  vertical-align: middle;
+}
+
+/* Action buttons */
+.inventory-table .actions a {
+  display: inline-block;
+  padding: 6px 10px;
+  margin: 2px;
+  font-size: 13px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.inventory-table .actions a[href*="edit"] {
+  background-color: #e7f1ff;
+  color: #0b5ed7;
+  border: 1px solid #cfe2ff;
+}
+
+.inventory-table .actions a[href*="edit"]:hover {
+  background-color: #d0e7ff;
+}
+
+.inventory-table .actions a[href*="delete"] {
+  background-color: #ffe7e7;
+  color: #d9534f;
+  border: 1px solid #f5c2c7;
+}
+
+.inventory-table .actions a[href*="delete"]:hover {
+  background-color: #ffc9c9;
+}
+
+/* Hover row effect */
+.inventory-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Center the "Add Size Variant" heading */
+h2 {
+  text-align: center;
+  color: #333;
+}
+.size-variant-wrapper {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+/* Form side */
+.size-variant-form {
+   background-color: #ffffff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Table box — make this wider */
+.size-variant-table {
+  flex: 2; /* You can even use 3 if needed */
+  min-width: 600px;
+  overflow-x: auto;
+}
+/* Style the form container */
+.size-variant-form-container {
+  width: 60%;
+  margin: 20px auto;
+  padding: 20px;
+  background: #f4f4f4;
+  border-radius: 8px;
+}
+
+/* Style the form button */
+.size-variant-form-container button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.size-variant-form-container button:hover {
+  background-color: #0056b3;
+}
+
+/* Style the table */
+table {
+  width: 90%;
+  margin: 0 auto 40px auto;
+  border-collapse: collapse;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+}
+
+td {
+  background-color: #fefefe;
+}
+
+a {
+  margin: 0 5px;
+  text-decoration: none;
+  color: #007bff;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+/* Style buttons inside table cells like Add Item style */
+.actions a {
+  display: inline-block;
+  padding: 6px 14px;
+  margin: 2px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.size-variant-table .actions a[href*="edit"] {
+  background-color: #e7f1ff;
+  color: #0b5ed7;
+  border: 1px solid #cfe2ff;
+  padding: 4px 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  
+}
+
+.size-variant-table .actions a[href*="edit"]:hover {
+  background-color: #d0e7ff;
+}
+
+.size-variant-table .actions a[href*="delete"] {
+  background-color: #ffe7e7;
+  color: #d9534f;
+  border: 1px solid #f5c2c7;
+  padding: 4px 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  
+}
+
+.size-variant-table .actions a[href*="delete"]:hover {
+  background-color: #ffc9c9;
+}
+
+/* === Image Preview === */
+img#preview,
+.form-right img {
+  display: block;
+  margin-top: 10px;
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* === Employee Card & Details === */
 .employee-card {
   display: flex;
   justify-content: space-between;
@@ -156,15 +446,21 @@ button[type="submit"]:hover {
   max-width: 900px;
   margin: 40px auto;
 }
+
+.employee-details {
+  flex: 2;
+}
+
 .employee-details h3 {
   text-align: center;
   margin-bottom: 20px;
   font-size: 22px;
 }
 
-
-.employee-details {
-  flex: 2;
+.employee-details p {
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.4;
 }
 
 .employee-photo {
@@ -177,24 +473,21 @@ button[type="submit"]:hover {
   height: auto;
   border-radius: 10px;
   border: 1px solid #ccc;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.employee-details p {
-  margin-bottom: 8px;
-  font-size: 16px;
-  line-height: 1.4;
-}
-
+/* === Search Form === */
 .search-form {
   text-align: center;
   margin-top: 20px;
 }
-.search-form input[type="text"] {
+
+.search-form input[type='text'] {
   padding: 8px;
   width: 250px;
   margin-right: 10px;
 }
+
 .search-form button {
   padding: 8px 16px;
 }
@@ -211,17 +504,84 @@ button[type="submit"]:hover {
 .clear-button:hover {
   background-color: #5a6268;
 }
-nav a {
-  margin-right: 15px;
-  text-decoration: none;
-  color: #333;
+
+/* === Table === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: center;
 }
 
-nav a:hover {
-  color: #007bff;
+th,
+td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
 }
-.container {
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 20px;
+
+th {
+  background-color: #0b5ed7;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+}
+
+td img {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+td a {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+  background-color: #eef4ff;
+  border-radius: 4px;
+  color: #0b5ed7;
+  text-decoration: none;
+}
+
+td a:hover {
+  background-color: #d6e3ff;
+}
+
+/* === Status Tags === */
+td span {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+td span[style*='green'] {
+  background-color: #e6f4ea;
+  color: green;
+}
+
+td span[style*='red'] {
+  background-color: #fdecea;
+  color: red;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .form-flex {
+    flex-direction: column;
+  }
+
+  .form-left,
+  .form-right,
+  img#preview {
+    width: 100%;
+    margin: 0 auto;
+  }
 }

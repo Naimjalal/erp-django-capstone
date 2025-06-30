@@ -4,88 +4,133 @@
 {% block content %}
 <h2>Add Stock Receipt</h2>
 
-<form method="post" enctype="multipart/form-data">
+<form id="stock-receipt-form" method="post" enctype="multipart/form-data">
   {% csrf_token %}
+  <div class="stock-receipt-wrapper">
 
-  <!-- 🧾 General Stock Receipt Info -->
-  <label><strong>Receipt No:</strong></label>
-  <input type="text" name="receipt_no" required />
+    <!-- Left: General Info -->
+    <div class="receipt-form">
+      <label><strong>Receipt No:</strong></label>
+      <input type="text" name="receipt_no" required />
 
-  <label><strong>Store:</strong></label>
-  <select name="store" required>
-    {% for store in stores %}
-      <option value="{{ store.id }}">{{ store.store_name }}</option>
-    {% endfor %}
-  </select>
+      <label><strong>Store:</strong></label>
+      <select name="store" required>
+        {% for store in stores %}
+          <option value="{{ store.id }}">{{ store.store_name }}</option>
+        {% endfor %}
+      </select>
 
-  <label><strong>Received Date:</strong></label>
-  <input type="date" name="received_date" required />
+      <label><strong>Received Date:</strong></label>
+      <input type="date" name="received_date" required />
 
-  <label><strong>Attachment:</strong></label>
-  <input type="file" name="attachment" />
+      <label><strong>Attachment:</strong></label>
+      <input type="file" name="attachment" />
+    </div>
 
-  <hr />
+    <!-- Right: Received Items Table -->
+    <div class="receipt-items">
+      <h3>Received Items</h3>
+      <table id="items-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Item</th>
+            <th>Size Variant</th>
+            <th>Quantity</th>
+            <th>Unit</th>
+            <th>Expiry Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="items-body">
+          <!-- JavaScript will inject rows -->
+        </tbody>
+      </table>
+      <button type="button" id="add-row" class="add-btn">+ Add Item</button>
+    </div>
+  </div>
 
-  <!-- 📦 Received Items Table -->
-  <h3>Received Items</h3>
-  <table id="items-table">
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th>Size Variant</th>
-        <th>Quantity</th>
-        <th>Unit</th>
-        <th>Expiry Date</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="items-body">
-      <!-- JavaScript will inject rows here -->
-    </tbody>
-  </table>
-
-  <button type="button" id="add-row">+ Add Item</button>
-  <br /><br />
-
-  <button type="submit">Submit Stock Receipt</button>
+  <button type="submit" class="submit-btn">Submit Stock Receipt</button>
 </form>
 
-<!-- 📜 JavaScript for dynamic row handling -->
+<!--  JavaScript -->
 <script>
-  const sizeVariants = {{ size_variant_data|safe }};
+    const sizeVariants = JSON.parse('{{ size_variant_data|safe|escapejs }}');
+    const itemData = JSON.parse('{{ item_data|safe|escapejs }}');
+    const itemExpiryMap =JSON.parse ('{{ item_expiry_map|safe|escapejs}}');
 
   function createRow() {
     const row = document.createElement('tr');
-
     row.innerHTML = `
       <td>
-        <select name="item[]" onchange="filterSizes(this)" required>
-          <option value="">-- Select Item --</option>
-          {% for item in items %}
-            <option value="{{ item.id }}">{{ item.item_name }}</option>
+        <select name="category[]" onchange="filterItems(this)" required>
+          <option value="">-- Select Category --</option>
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.category_name }}</option>
           {% endfor %}
         </select>
       </td>
-
+      <td>
+        <select name="item[]" onchange="filterSizes(this)" disabled required>
+          <option value="">-- Select Item --</option>
+        </select>
+      </td>
       <td>
         <select name="size_variant[]" disabled required>
           <option value="">-- Select Size --</option>
         </select>
       </td>
-
       <td><input type="number" name="quantity[]" min="1" required /></td>
       <td><input type="text" name="unit[]" placeholder="pcs, box..." required /></td>
-      <td><input type="date" name="expiry_date[]" /></td>
+      <td><input type="date" name="expiry_date[]" style="display: none;" /></td>
       <td><button type="button" onclick="removeRow(this)">🗑</button></td>
     `;
-
     document.getElementById('items-body').appendChild(row);
+  }
+
+  function filterItems(categorySelect) {
+    const categoryId = categorySelect.value;
+    const row = categorySelect.closest('tr');
+    const itemSelect = row.querySelector('select[name="item[]"]');
+    const sizeSelect = row.querySelector('select[name="size_variant[]"]');
+
+    itemSelect.innerHTML = '<option value="">-- Select Item --</option>';
+    sizeSelect.innerHTML = '<option value="">-- Select Size --</option>';
+    sizeSelect.disabled = true;
+
+    if (categoryId && itemData[categoryId]) {
+      itemData[categoryId].forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.id;
+        opt.textContent = item.name;
+        opt.setAttribute('data-has-expiry', item.has_expiry);
+        itemSelect.appendChild(opt);
+      });
+      itemSelect.disabled = false;
+    } else {
+      itemSelect.disabled = true;
+    }
   }
 
   function filterSizes(itemSelect) {
     const itemId = itemSelect.value;
     const row = itemSelect.closest('tr');
     const sizeSelect = row.querySelector('select[name="size_variant[]"]');
+    const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+    const hasExpiry = selectedOption.getAttribute('data-has-expiry') === 'true';
+
+    // const expiryInput = row.querySelector('input[name="expiry_date[]"]');
+    // expiryInput.closest('td').style.display = hasExpiry ? 'table-cell' : 'none';
+    // Show or hide expiry date field
+    const expiryInput = row.querySelector('input[name="expiry_date[]"]');
+    if (itemExpiryMap[itemId]) {
+      expiryInput.style.display = 'inline-block';
+    } 
+    else {
+  expiryInput.style.display = 'none';
+}
+
+
 
     sizeSelect.innerHTML = '<option value="">-- Select Size --</option>';
 
@@ -107,9 +152,142 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    createRow(); // Add the first row by default
+    createRow();
     document.getElementById('add-row').addEventListener('click', createRow);
+  });
+
+  document.getElementById('stock-receipt-form').addEventListener('submit', function (e) {
+    const itemRows = document.querySelectorAll('#items-body tr');
+    if (itemRows.length === 0) {
+      alert('Please add at least one item before submitting.');
+      e.preventDefault();
+      return;
+    }
+
+    let isValid = true;
+    itemRows.forEach((row) => {
+      const item = row.querySelector('select[name="item[]"]').value;
+      const qty = row.querySelector('input[name="quantity[]"]').value;
+      const unit = row.querySelector('input[name="unit[]"]').value;
+
+      if (!item || !qty || !unit) {
+        isValid = false;
+      }
+    });
+
+    if (!isValid) {
+      alert('Please fill all required fields in item rows.');
+      e.preventDefault();
+    }
   });
 </script>
 
+<!-- 🎨 CSS -->
+<style>
+  .stock-receipt-wrapper {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 20px;
+  }
+
+  .receipt-form {
+    flex: 0 0 30%;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+  }
+
+  .receipt-form label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+  }
+
+  .receipt-form input,
+  .receipt-form select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  .submit-btn {
+    margin: 20px 0;
+    background-color: #198754;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .submit-btn:hover {
+    background-color: #157347;
+  }
+
+  .receipt-items {
+    flex: 2;
+  }
+
+  .receipt-items table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .receipt-items th,
+  .receipt-items td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+
+  .add-btn {
+    margin-top: 10px;
+    background-color: #e7f1ff;
+    color: #0b5ed7;
+    border: 1px solid #cfe2ff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .add-btn:hover {
+    background-color: #d0e7ff;
+  }
+
+  button[type="button"]:hover {
+    background-color: #ffe6e6;
+  }
+
+  #items-table input,
+  #items-table select {
+    padding: 6px 10px;
+    height: 38px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  #items-table input[type="date"] {
+    height: 38px;
+  }
+
+  #items-table button {
+    height: 38px;
+    padding: 0 10px;
+    background-color: #eee;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  #items-table button:hover {
+    background-color: #ddd;
+  }
+</style>
 {% endblock %}

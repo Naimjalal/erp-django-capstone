@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'inventory/css/inventory.css' %}" />
+<!-- <link rel="stylesheet" href="{% static 'inventory/css/inventory.css' %}" /> -->
 
-<h2>Add Inventory Item</h2>
 
 <div class="inventory-wrapper">
   <!-- FORM SIDE -->
   <div class="inventory-form">
+    <h2>Add Inventory Item</h2>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       {{ form.as_p }}

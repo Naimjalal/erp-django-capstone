@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# print()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -81,10 +87,9 @@ WSGI_APPLICATION = 'erp_system.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'erp_inventory',
-        'USER':'postgres',
-        'PASSWORD':1234,
-        'PORT':'5432'
+        'NAME': os.getenv('DATABASENAME'),
+        'USER':os.getenv('DATABASEUSER'),
+        'PASSWORD': os.getenv('DATABASEPASSWORD'),
     }
 }
 

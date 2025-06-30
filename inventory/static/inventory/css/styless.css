@@ -1,0 +1,383 @@
+/* === Homepage === */
+.homepage-message {
+  background-color: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  margin: 50px auto;
+  max-width: 800px;
+  text-align: left;
+}
+
+.homepage-message h2 {
+  color: #004080;
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+/* === Base Layout === */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+header {
+  background-color: #0b5ed7;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 1rem;
+  gap: 12px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+nav a {
+  background-color: #ffffff;
+  color: #0b5ed7;
+  padding: 8px 14px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  border: 1px solid #0b5ed7;
+  transition: all 0.3s ease;
+}
+
+nav a:hover {
+  background-color: #e0e4ea;
+  color: #ffffff;
+}
+
+main {
+  padding: 40px 20px;
+  min-height: 70vh;
+}
+
+footer {
+  background-color: #0b5ed7;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  margin-top: 40px;
+}
+
+.form-container {
+  background: white;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 30px 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.form-flex {
+  display: flex;
+  gap: 40px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.form-left {
+  flex: 2;
+  min-width: 300px;
+}
+
+.form-right {
+  flex: 1;
+  min-width: 200px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 6px;
+}
+
+input[type='text'],
+input[type='date'],
+input[type='file'],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+input[type='checkbox'] {
+  margin-top: 8px;
+}
+
+.form-help {
+  margin-top: 5px;
+  font-size: 12px;
+  color: gray;
+}
+
+.form-right label {
+  margin-bottom: 6px;
+  display: block;
+  font-weight: bold;
+}
+
+.form-right input[type='file'] {
+  margin-bottom: 10px;
+}
+
+.form-right .current-image-label {
+  margin-top: 15px;
+  font-weight: bold;
+  display: block;
+}
+
+img#preview,
+.form-right img {
+  display: block;
+  margin-top: 10px;
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px; /* Use 50% if you want circular profile */
+  border: 1px solid #ccc;
+}
+
+/* Optional: Circular preview image (comment above and uncomment below for rounded) */
+/*
+img#preview,
+.form-right img {
+  border-radius: 50%;
+}
+*/
+
+.form-actions {
+  text-align: left;
+  margin-top: 30px;
+}
+
+button[type='submit'] {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 25px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button[type='submit']:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+  .form-flex {
+    flex-direction: column;
+  }
+
+  .form-left,
+  .form-right {
+    width: 100%;
+  }
+
+  img#preview,
+  .form-right img {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* for employee search */
+
+.employee-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 900px;
+  margin: 40px auto;
+}
+.employee-details h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.employee-details {
+  flex: 2;
+}
+
+.employee-photo {
+  flex: 1;
+  text-align: center;
+}
+
+.employee-photo img {
+  max-width: 180px;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.employee-details p {
+  margin-bottom: 8px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.search-form {
+  text-align: center;
+  margin-top: 20px;
+}
+.search-form input[type='text'] {
+  padding: 8px;
+  width: 250px;
+  margin-right: 10px;
+}
+.search-form button {
+  padding: 8px 16px;
+}
+
+.clear-button {
+  padding: 10px 20px;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.clear-button:hover {
+  background-color: #5a6268;
+}
+nav a {
+  margin-right: 15px;
+  text-decoration: none;
+  color: #333;
+}
+
+nav a:hover {
+  color: #007bff;
+}
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 20px;
+}
+/* === Employee List Page === */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: center;
+}
+
+th,
+td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
+}
+
+th {
+  background-color: #0b5ed7;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+}
+
+tr:hover {
+  background-color: #f1f5ff;
+}
+
+td img {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+/* === Filter Dropdown === */
+form label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+select#section {
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: auto;
+  min-width: 200px;
+  max-width: 300px;
+  margin-bottom: 15px;
+}
+
+/* === Action Buttons in Table === */
+td a {
+  display: inline-block;
+  margin-right: 8px;
+  color: #0b5ed7;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+td a:hover {
+  background-color: #e0e7ff;
+}
+
+td em {
+  color: gray;
+}
+
+/* === Status Tags === */
+td span {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+td span[style*='green'] {
+  background-color: #e6f4ea;
+  color: green;
+}
+
+td span[style*='red'] {
+  background-color: #fdecea;
+  color: red;
+}

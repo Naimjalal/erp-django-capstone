@@ -1,13 +1,19 @@
-{%extends 'base.html'%}
+{% extends 'base.html' %}
 
-{% block content%}
-<h2>Add Inventory Category</h2>
+{% block content %}
+<div class="form-container">
+  <h2 class="form-title">Add Inventory Category</h2>
 
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p}}
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="{{ form.category_name.id_for_label }}">Category Name:</label>
+      {{ form.category_name }}
+    </div>
 
-  <button type="submit">Add Category</button>
-
-</form>
+    <div class="form-actions">
+      <button type="submit">Add Category</button>
+    </div>
+  </form>
+</div>
 {% endblock %}
