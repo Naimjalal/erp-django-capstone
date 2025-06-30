@@ -10,6 +10,12 @@ urlpatterns = [
     path('size-variant/edit/<int:pk>/', views.edit_size_variant, name='edit_size_variant'),
     path('size-variant/delete/<int:pk>/', views.delete_size_variant, name='delete_size_variant'),
     path('stock-receipt/add/', views.add_stock_receipt, name='add_stock_receipt'),
+    path('stock-receipts/', views.stock_receipt_list, name='stock_receipt_list'),
+    path('receipts/<int:pk>/', views.receipt_detail, name='receipt_detail'),
+    path('stock-receipt/<int:pk>/', views.receipt_detail, name='stock_receipt_detail'),
+
+
+
 
 
 ]

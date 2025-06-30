@@ -186,3 +186,18 @@ def add_stock_receipt(request):
     }
 
     return render(request, 'inventory/add_stock_receipt.html', context)
+
+def stock_receipt_list(request):
+    receipts = StockReceipt.objects.select_related('store', 'received_by').order_by('-received_date')
+    return render(request, 'inventory/stock_receipt_list.html', {'receipts': receipts})
+
+def receipt_detail(request, pk):
+    receipt = get_object_or_404(StockReceipt, pk=pk)
+    items = receipt.receipt_items.all()
+   
+
+    return render(request, 'inventory/receipt_detail.html',{
+        'receipt': receipt,
+        'items': items
+
+    })

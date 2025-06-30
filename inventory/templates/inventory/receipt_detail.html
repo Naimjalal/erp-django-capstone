@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Receipt Details - {{ receipt.receipt_no }}</h2>
+
+<p><strong>Store:</strong> {{ receipt.store.store_name }}</p>
+<p><strong>Received Date:</strong> {{ receipt.received_date }}</p>
+<p><strong>Received By:</strong> {{ receipt.received_by }}</p>
+<p><strong>Attachment:</strong>
+  {% if receipt.attachment %}
+    <a href="{{ receipt.attachment.url }}" target="_blank">View File</a>
+  {% else %}
+    No file attached
+  {% endif %}
+</p>
+
+<h3>Received Items</h3>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Size</th>
+      <th>Quantity</th>
+      <th>Unit</th>
+      <th>Expiry Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+      <tr>
+        <td>{{ item.item.item_name }}</td>
+        <td>{{ item.size_variant.size_label }}</td>
+        <td>{{ item.quantity_received }}</td>
+        <td>{{ item.unit }}</td>
+        <td>{{ item.expiry_date|default:"—" }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<br>
+<a href="{% url 'stock_receipt_list' %}">🔙 Back to Receipt List</a>
+{% endblock %}
