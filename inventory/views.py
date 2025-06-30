@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .forms import InventoryCategoryForm, InventoryItemForm, SizeVariantForm,StockReceiptForm, StockReceiptItemFormSet
 from .models import Inventory_Item,SizeVariant, StockReceipt, StockReceiptItem, Supplier,Inventory_Category
+from django.db.models import Sum
 from collections import defaultdict
 from employees.models import Store
 from django.utils import timezone
@@ -54,41 +55,34 @@ def delete_inventory_item(request, item_id):
     item.delete()
     return redirect('add_inventory_item')
 
-
-
-# def add_size_variant(request):
-#     form = SizeVariantForm()
-#     variants = SizeVariant.objects.select_related('item')  # For item.item_name access
-
-#     if request.method == 'POST':
-#         form = SizeVariantForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('add_size_variant')  # Redirect back to the same form or change if needed
-
-#     return render(request, 'inventory/add_size_variant.html', {'form': form,'variants': variants })
 def add_size_variant(request):
-    from .forms import SizeVariantForm
-
     if request.method == 'POST':
         form = SizeVariantForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('add_size_variant')  # Refresh the view after saving
+            return redirect('add_size_variant')
     else:
         form = SizeVariantForm()
 
-    # Grouping SizeVariants by item
+    # Group variants and include qty data
     grouped_variants = defaultdict(list)
     for variant in SizeVariant.objects.select_related('item'):
-        grouped_variants[variant.item].append(variant)
+        total_received = StockReceiptItem.objects.filter(size_variant=variant).aggregate(
+            total=Sum('quantity_received')
+        )['total'] or 0
+
+        # For now current_qty = total_received (subtract returns/issuance later)
+        grouped_variants[variant.item].append({
+            'variant': variant,
+            'original_qty': total_received,
+            'current_qty': total_received,
+        })
 
     context = {
         'form': form,
-        'grouped_variants': grouped_variants.items(),  # gives (item, [variants])
+        'grouped_variants': grouped_variants.items(),  # item -> list of {variant, qtys}
     }
     return render(request, 'inventory/add_size_variant.html', context)
-
 
 def edit_size_variant(request, pk):
     size_variant = get_object_or_404(SizeVariant, pk=pk)
@@ -201,3 +195,5 @@ def receipt_detail(request, pk):
         'items': items
 
     })
+
+
