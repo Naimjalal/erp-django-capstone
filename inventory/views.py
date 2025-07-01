@@ -3,7 +3,7 @@ from django.forms import modelform_factory, inlineformset_factory
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import InventoryCategoryForm, InventoryItemForm, SizeVariantForm,StockReceiptForm, StockReceiptItemFormSet,ItemIssuanceForm, ItemIssuanceItemForm
-from .models import Inventory_Item,SizeVariant, StockReceipt, StockReceiptItem, Supplier,Inventory_Category,ItemIssuance,ItemIssuanceItem
+from .models import Inventory_Item,SizeVariant, StockReceipt, StockReceiptItem, Supplier,Inventory_Category,ItemIssuance,ItemIssuanceItem,ItemReturn, ItemReturnItem
 from django.db.models import Sum
 from collections import defaultdict
 from employees.models import Store,Employee
@@ -71,20 +71,19 @@ def add_size_variant(request):
     grouped_variants = defaultdict(list)
 
     for variant in SizeVariant.objects.select_related('item'):
-        # 1. Total stock received from StockReceiptItem
+        
         total_received = StockReceiptItem.objects.filter(size_variant=variant).aggregate(
             total=Sum('quantity_received')
         )['total'] or 0
 
-        # 2. Total stock issued from ItemIssuanceItem
+        
         total_issued = ItemIssuanceItem.objects.filter(size_variant=variant).aggregate(
             total=Sum('quantity')
         )['total'] or 0
 
-        # 3. Calculate current available stock
+        
         calculated_current = total_received - total_issued
 
-        # 4. Update values in the DB if needed
         if (
             variant.quantity_original != total_received or
             variant.quantity_current != calculated_current
@@ -93,7 +92,7 @@ def add_size_variant(request):
             variant.quantity_current = max(0, calculated_current)
             variant.save()
 
-        # 5. Prepare grouped data for template
+        
         grouped_variants[variant.item].append({
             'variant': variant,
             'original_qty': variant.quantity_original,
@@ -147,7 +146,7 @@ def add_stock_receipt(request):
             received_by=request.user if request.user.is_authenticated else None
         )
 
-        # Save StockReceiptItems (loop through multiple rows)
+        
         items_list = request.POST.getlist('item[]')
         sizes_list = request.POST.getlist('size_variant[]')
         qty_list = request.POST.getlist('quantity[]')
@@ -156,10 +155,10 @@ def add_stock_receipt(request):
 
         for i in range(len(items_list)):
             item_id = items_list[i]
-            size_id = sizes_list[i] or None  # Optional
+            size_id = sizes_list[i] or None  
             quantity = qty_list[i]
             unit = unit_list[i]
-            expiry = expiry_list[i] or None  # Optional
+            expiry = expiry_list[i] or None  
 
             StockReceiptItem.objects.create(
                 stock_receipt=stock_receipt,
@@ -170,9 +169,9 @@ def add_stock_receipt(request):
                 expiry_date=expiry
             )
 
-        return redirect('add_stock_receipt')  # Success
+        return redirect('add_stock_receipt')  
 
-    # ===== Build size_variant data for JS (item_id -> variants)
+    
     size_variant_data = defaultdict(list)
     for variant in SizeVariant.objects.select_related('item'):
         size_variant_data[variant.item.id].append({
@@ -180,7 +179,7 @@ def add_stock_receipt(request):
             'size_label': variant.size_label
         })
 
-    # ===== Build item data by category_id for JS (category_id -> [items])
+   
     item_data = defaultdict(list)
     item_expiry_map = {item.id: item.has_expiry for item in items} 
     for item in items:
@@ -225,7 +224,7 @@ def delete_stock_receipt(request, pk):
     receipt = get_object_or_404(StockReceipt, pk=pk)
     if request.method == 'POST':
         receipt.delete()
-        return redirect('stock_receipt_list')  # back to list after deletion
+        return redirect('stock_receipt_list')  
 
     return render(request, 'inventory/confirm_delete_receipt.html', {'receipt': receipt})
 
@@ -264,7 +263,7 @@ def add_item_issuance(request):
                 quantity=quantity
             )
 
-            # ✅ Move inside POST: Subtract issued qty from SizeVariant
+            
             if size_id:
                 size_variant = SizeVariant.objects.get(id=size_id)
                 size_variant.quantity_current = max(0, size_variant.quantity_current - quantity)
@@ -309,3 +308,75 @@ def item_issuance_list(request):
         'issuances': issuances
     })
 
+
+@login_required
+def return_items(request):
+    employees = Employee.objects.all()
+    issued_items = []
+
+    if request.method == 'POST':
+        employee_id = request.POST.get('employee')
+        if employee_id:
+            
+            returned_issuance_ids = ItemReturn.objects.values_list('issuance_id', flat=True)
+
+            issuances = ItemIssuance.objects.filter(
+            employee_id=employee_id
+            ).exclude(id__in=returned_issuance_ids).order_by('-issue_date')
+
+            for issuance in issuances:
+                for item in issuance.items.filter(item__is_returnable=True):
+                    issued_items.append({
+                        'issuance_id': issuance.id,
+                        'item_id': item.item.id,
+                        'size_variant_id': item.size_variant.id if item.size_variant else '',
+                        'item_name': item.item.item_name,
+                        'size': item.size_variant.size_label if item.size_variant else '',
+                        'quantity': item.quantity
+                    })
+
+    return render(request, 'inventory/return_items.html', {
+        'employees': employees,
+        'issued_items': issued_items
+    })
+
+@login_required
+def confirm_return(request):
+    if request.method == 'POST':
+        employee_id = request.POST.get('employee_id')
+        return_item_ids = request.POST.getlist('return_item_ids[]')
+
+        if not return_item_ids:
+            messages.error(request, "No items selected for return.")
+            return redirect('return_items')
+
+      
+        first_issuance_id = request.POST.get(f'issuance_id_{return_item_ids[0]}')
+        issuance = get_object_or_404(ItemIssuance, id=first_issuance_id)
+
+        item_return = ItemReturn.objects.create(
+            issuance=issuance,
+            returned_by=request.user,
+            card_verified=False,
+            verification_time=None
+        )
+
+        for i in return_item_ids:
+            item_id = request.POST.get(f'item_id_{i}')
+            size_variant_id = request.POST.get(f'size_variant_id_{i}') or None
+            quantity = int(request.POST.get(f'quantity_{i}'))
+
+            ItemReturnItem.objects.create(
+                return_record=item_return,
+                item_id=item_id,
+                size_variant_id=size_variant_id,
+                quantity=quantity
+            )
+
+            if size_variant_id:
+                size_variant = SizeVariant.objects.get(id=size_variant_id)
+                size_variant.quantity_current += quantity
+                size_variant.save()
+
+        messages.success(request, "Items returned successfully.")
+        return redirect('item_issuance_list')

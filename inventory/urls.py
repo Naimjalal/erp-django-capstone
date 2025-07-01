@@ -16,6 +16,10 @@ urlpatterns = [
     path('stock-receipt/delete/<int:pk>/', views.delete_stock_receipt, name='delete_stock_receipt'),
     path('issue-items/', views.add_item_issuance, name='add_item_issuance'),
     path('issuances/', views.item_issuance_list, name='item_issuance_list'),
+    path('return-items/', views.return_items, name='return_items'),
+    path('confirm-return/', views.confirm_return, name='confirm_return'),
+
+
 
 
 

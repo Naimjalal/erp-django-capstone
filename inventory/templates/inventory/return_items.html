@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Return Issued Items</h2>
+
+<form method="POST">
+  {% csrf_token %}
+  <label for="employee">Select Employee:</label>
+  <select name="employee" id="employee" required>
+    <option value="">-- Choose Employee --</option>
+    {% for emp in employees %}
+      <option value="{{ emp.id }}" {% if emp.id|stringformat:"s" == request.POST.employee %}selected{% endif %}>
+        {{ emp.employee_name }}
+      </option>
+    {% endfor %}
+  </select>
+  <button type="submit">Fetch Issued Items</button>
+</form>
+
+{% if issued_items %}
+  <hr>
+  <form method="POST" action="{% url 'confirm_return' %}">
+    {% csrf_token %}
+    <input type="hidden" name="employee_id" value="{{ request.POST.employee }}">
+    <h3>Issued Returnable Items</h3>
+    <table border="1" cellpadding="8">
+      <tr>
+        <th>Return</th>
+        <th>Item Name</th>
+        <th>Size</th>
+        <th>Qty Issued</th>
+        <th>Return Qty</th>
+      </tr>
+      {% for item in issued_items %}
+        <tr>
+          <td>
+            <input type="checkbox" name="return_item_ids[]" value="{{ forloop.counter0 }}">
+          </td>
+          <td>{{ item.item_name }}</td>
+          <td>{{ item.size }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>
+            <input type="number" name="quantity_{{ forloop.counter0 }}" value="{{ item.quantity }}" min="1" max="{{ item.quantity }}">
+            <input type="hidden" name="item_id_{{ forloop.counter0 }}" value="{{ item.item_id }}">
+            <input type="hidden" name="size_variant_id_{{ forloop.counter0 }}" value="{{ item.size_variant_id }}">
+            <input type="hidden" name="issuance_id_{{ forloop.counter0 }}" value="{{ item.issuance_id }}">
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+    <br>
+    <button type="submit">Return Selected Items</button>
+  </form>
+{% endif %}
+
+{% endblock %}
