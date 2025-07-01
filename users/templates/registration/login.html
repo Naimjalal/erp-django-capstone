@@ -1,17 +1,36 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-  <h2>Login</h2>
+<div class="login-container">
+  <h2 class="login-title">Login</h2>
 
-  {% if user.is_authenticated %}
-    <script>window.location.href = "/";</script>
-  {% else %}
-    <form method="post" action="{% url 'login' %}">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Login</button>
-    </form>
-  {% endif %}
 
+
+  <form method="post" action="{% url 'login' %}" class="login-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+  <div class="login-error">
+    <p>Please enter a correct username and password.</p>
+  </div>
+    {% endif %}
+
+
+    <div class="login-form-group">
+      <label for="id_username" class="login-label">Username:</label>
+      <input type="text" name="username" id="id_username" required class="login-input" />
+    </div>
+
+    <div class="login-form-group">
+      <label for="id_password" class="login-label">Password:</label>
+      <input type="password" name="password" id="id_password" required class="login-input" />
+    </div>
+
+    <button type="submit" class="login-button">Login</button>
+  </form>
+</div>
 {% endblock %}
+
+
+
 
