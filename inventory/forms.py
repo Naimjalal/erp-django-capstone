@@ -1,5 +1,5 @@
 from django import forms
-from .models import Inventory_Category,Inventory_Item, SizeVariant, StockReceipt, StockReceiptItem
+from .models import Inventory_Category,Inventory_Item, SizeVariant, StockReceipt, StockReceiptItem,ItemIssuance, ItemIssuanceItem
 from django.forms import inlineformset_factory
 
 class InventoryCategoryForm(forms.ModelForm):
@@ -45,3 +45,18 @@ StockReceiptItemFormSet = inlineformset_factory(
     extra=1,
     can_delete=True
 )
+
+
+class ItemIssuanceForm(forms.ModelForm):
+    class Meta:
+        model = ItemIssuance
+        fields = ['employee', 'issue_date', 'shift', 'is_emergency', 'card_verified', 'verification_time', 'note']
+        widgets = {
+            'issue_date': forms.DateInput(attrs={'type': 'date'}),
+            'verification_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+class ItemIssuanceItemForm(forms.ModelForm):
+    class Meta:
+        model = ItemIssuanceItem
+        fields = ['item', 'size_variant', 'quantity']

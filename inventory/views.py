@@ -1,13 +1,17 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .forms import InventoryCategoryForm, InventoryItemForm, SizeVariantForm,StockReceiptForm, StockReceiptItemFormSet
-from .models import Inventory_Item,SizeVariant, StockReceipt, StockReceiptItem, Supplier,Inventory_Category
+from django.forms import modelform_factory, inlineformset_factory
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .forms import InventoryCategoryForm, InventoryItemForm, SizeVariantForm,StockReceiptForm, StockReceiptItemFormSet,ItemIssuanceForm, ItemIssuanceItemForm
+from .models import Inventory_Item,SizeVariant, StockReceipt, StockReceiptItem, Supplier,Inventory_Category,ItemIssuance,ItemIssuanceItem
 from django.db.models import Sum
 from collections import defaultdict
-from employees.models import Store
+from employees.models import Store,Employee
 from django.utils import timezone
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 import json
+from django.forms import modelformset_factory
 # Create your views here.
 
 def add_inventory_category(request):
@@ -64,25 +68,45 @@ def add_size_variant(request):
     else:
         form = SizeVariantForm()
 
-    # Group variants and include qty data
     grouped_variants = defaultdict(list)
+
     for variant in SizeVariant.objects.select_related('item'):
+        # 1. Total stock received from StockReceiptItem
         total_received = StockReceiptItem.objects.filter(size_variant=variant).aggregate(
             total=Sum('quantity_received')
         )['total'] or 0
 
-        # For now current_qty = total_received (subtract returns/issuance later)
+        # 2. Total stock issued from ItemIssuanceItem
+        total_issued = ItemIssuanceItem.objects.filter(size_variant=variant).aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
+
+        # 3. Calculate current available stock
+        calculated_current = total_received - total_issued
+
+        # 4. Update values in the DB if needed
+        if (
+            variant.quantity_original != total_received or
+            variant.quantity_current != calculated_current
+        ):
+            variant.quantity_original = total_received
+            variant.quantity_current = max(0, calculated_current)
+            variant.save()
+
+        # 5. Prepare grouped data for template
         grouped_variants[variant.item].append({
             'variant': variant,
-            'original_qty': total_received,
-            'current_qty': total_received,
+            'original_qty': variant.quantity_original,
+            'current_qty': variant.quantity_current,
         })
 
     context = {
         'form': form,
-        'grouped_variants': grouped_variants.items(),  # item -> list of {variant, qtys}
+        'grouped_variants': grouped_variants.items(),
     }
+
     return render(request, 'inventory/add_size_variant.html', context)
+
 
 def edit_size_variant(request, pk):
     size_variant = get_object_or_404(SizeVariant, pk=pk)
@@ -204,3 +228,84 @@ def delete_stock_receipt(request, pk):
         return redirect('stock_receipt_list')  # back to list after deletion
 
     return render(request, 'inventory/confirm_delete_receipt.html', {'receipt': receipt})
+
+@login_required
+def add_item_issuance(request):
+    categories = Inventory_Category.objects.all()
+    items = Inventory_Item.objects.select_related('category')
+    size_variants = SizeVariant.objects.select_related('item')
+    employees = Employee.objects.all()
+
+    if request.method == 'POST':
+        issuance = ItemIssuance.objects.create(
+            employee_id=request.POST.get('employee'),
+            issue_date=request.POST.get('issue_date'),
+            shift=request.POST.get('shift'),
+            is_emergency=bool(request.POST.get('is_emergency')),
+            card_verified=bool(request.POST.get('card_verified')),
+            verification_time=request.POST.get('verification_time') or None,
+            note=request.POST.get('note'),
+            issued_by=request.user
+        )
+
+        items_list = request.POST.getlist('item[]')
+        sizes_list = request.POST.getlist('size_variant[]')
+        qty_list = request.POST.getlist('quantity[]')
+
+        for i in range(len(items_list)):
+            item_id = items_list[i]
+            size_id = sizes_list[i] or None
+            quantity = int(qty_list[i])
+
+            ItemIssuanceItem.objects.create(
+                issuance=issuance,
+                item_id=item_id,
+                size_variant_id=size_id,
+                quantity=quantity
+            )
+
+            # ✅ Move inside POST: Subtract issued qty from SizeVariant
+            if size_id:
+                size_variant = SizeVariant.objects.get(id=size_id)
+                size_variant.quantity_current = max(0, size_variant.quantity_current - quantity)
+                size_variant.save()
+
+        return redirect('item_issuance_list')  # ✅ success redirect
+
+    # GET method → prepare form
+    item_data = {}
+    for item in items:
+        item_data.setdefault(item.category_id, []).append({
+            'id': item.id,
+            'name': item.item_name,
+            'has_expiry': item.has_expiry
+        })
+
+    size_variant_data = {}
+    for sv in size_variants:
+        size_variant_data.setdefault(sv.item_id, []).append({
+            'id': sv.id,
+            'size_label': sv.size_label
+        })
+
+    item_expiry_map = {item.id: item.has_expiry for item in items}
+
+    context = {
+        'employees': employees,
+        'categories': categories,
+        'item_data': json.dumps(item_data),
+        'size_variant_data': json.dumps(size_variant_data),
+        'item_expiry_map': json.dumps(item_expiry_map),
+    }
+
+    return render(request, 'inventory/add_item_issuance.html', context)
+
+
+
+
+def item_issuance_list(request):
+    issuances = ItemIssuance.objects.all().order_by('-issue_date')
+    return render(request, 'inventory/item_issuance_list.html', {
+        'issuances': issuances
+    })
+

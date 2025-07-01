@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Issued Items List</h2>
+
+  {% for issuance in issuances %}
+    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+      <strong>Employee:</strong> {{ issuance.employee }}<br>
+      <strong>Issued By:</strong> {{ issuance.issued_by }}<br>
+      <strong>Date:</strong> {{ issuance.issue_date }}<br>
+      <strong>Shift:</strong> {{ issuance.shift }}<br>
+      <strong>Note:</strong> {{ issuance.note }}<br>
+
+      <h4>Items:</h4>
+      <ul>
+        {% for item in issuance.items.all %}
+          <li>{{ item.item }} - {{ item.size_variant }} - Qty: {{ item.quantity }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% empty %}
+    <p>No items have been issued yet.</p>
+  {% endfor %}
+{% endblock %}

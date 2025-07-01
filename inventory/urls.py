@@ -14,6 +14,9 @@ urlpatterns = [
     path('receipts/<int:pk>/', views.receipt_detail, name='receipt_detail'),
     path('stock-receipt/<int:pk>/', views.receipt_detail, name='stock_receipt_detail'),
     path('stock-receipt/delete/<int:pk>/', views.delete_stock_receipt, name='delete_stock_receipt'),
+    path('issue-items/', views.add_item_issuance, name='add_item_issuance'),
+    path('issuances/', views.item_issuance_list, name='item_issuance_list'),
+
 
 
 

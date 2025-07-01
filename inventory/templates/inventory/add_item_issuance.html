@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Issue Items to Employee</h2>
+
+<form method="post">
+  {% csrf_token %}
+
+  <div class="form-container" style="display: flex; gap: 40px;">
+    
+    <!-- Left: Issuance Details -->
+    <div class="issuance-form">
+      <h3>Issuance Details</h3>
+      <label>Employee:</label>
+      <select name="employee" required>
+        <option value="">-- Select Employee --</option>
+        {% for emp in employees %}
+          <option value="{{ emp.id }}">{{ emp }}</option>
+        {% endfor %}
+      </select>
+
+      <label>Issue Date:</label>
+      <input type="date" name="issue_date" required>
+
+      <label>Shift:</label>
+      <input type="text" name="shift">
+
+      <label><input type="checkbox" name="is_emergency"> Is Emergency</label><br>
+      <label><input type="checkbox" name="card_verified"> Card Verified</label><br>
+
+      <label>Verification Time:</label>
+      <input type="datetime-local" name="verification_time">
+
+      <label>Note:</label>
+      <textarea name="note"></textarea>
+
+      <br>
+      <button type="submit">Submit Issuance</button>
+    </div>
+
+    <!-- Right: Items Table -->
+    <div class="item-formset">
+      <h3>Items to Issue</h3>
+      <table border="1" width="100%">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Item</th>
+            <th>Size Variant</th>
+            <th>Quantity</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="items-body">
+          <!-- One default row -->
+          <tr class="item-row">
+            <td>
+              <select class="category-dropdown">
+                <option value="">-- Select --</option>
+                {% for cat in categories %}
+                  <option value="{{ cat.id }}">{{ cat.category_name }}</option>
+                {% endfor %}
+              </select>
+            </td>
+            <td>
+              <select name="item[]" class="item-dropdown" required>
+                <option value="">-- Select --</option>
+              </select>
+            </td>
+            <td>
+              <select name="size_variant[]" class="size-dropdown">
+                <option value="">-- Optional --</option>
+              </select>
+            </td>
+            <td>
+              <input type="number" name="quantity[]" min="1" required>
+            </td>
+            <td>
+              <button type="button" class="delete-row">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br>
+      <button type="button" id="add-row">+ Add Item</button>
+    </div>
+
+  </div>
+</form>
+
+<script>
+  const itemData = {{ item_data|safe }};
+  const sizeData = {{ size_variant_data|safe }};
+
+  function updateItemDropdown(row, categoryId) {
+    const itemDropdown = row.querySelector('.item-dropdown');
+    itemDropdown.innerHTML = '<option value="">-- Select --</option>';
+    (itemData[categoryId] || []).forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = item.name;
+      itemDropdown.appendChild(opt);
+    });
+  }
+
+  function updateSizeDropdown(row, itemId) {
+    const sizeDropdown = row.querySelector('.size-dropdown');
+    sizeDropdown.innerHTML = '<option value="">-- Optional --</option>';
+    (sizeData[itemId] || []).forEach(variant => {
+      const opt = document.createElement('option');
+      opt.value = variant.id;
+      opt.textContent = variant.size_label;
+      sizeDropdown.appendChild(opt);
+    });
+  }
+
+  // Event delegation for dynamic rows
+  document.getElementById('items-body').addEventListener('change', function (e) {
+    const row = e.target.closest('.item-row');
+    if (e.target.classList.contains('category-dropdown')) {
+      updateItemDropdown(row, e.target.value);
+      row.querySelector('.size-dropdown').innerHTML = '<option value="">-- Optional --</option>';
+    }
+    if (e.target.classList.contains('item-dropdown')) {
+      updateSizeDropdown(row, e.target.value);
+    }
+  });
+
+  document.getElementById('add-row').addEventListener('click', () => {
+    const row = document.querySelector('.item-row');
+    const newRow = row.cloneNode(true);
+
+    // Clear all inputs/selects
+    newRow.querySelectorAll('select, input').forEach(input => input.value = '');
+
+    document.getElementById('items-body').appendChild(newRow);
+  });
+
+  document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('delete-row')) {
+      const row = e.target.closest('tr');
+      const rows = document.querySelectorAll('.item-row');
+      if (rows.length > 1) row.remove();
+    }
+  });
+</script>
+
+<style>
+  .form-container {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+  }
+
+  .issuance-form {
+    flex: 1;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+  }
+
+  .issuance-form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+
+  .issuance-form input,
+  .issuance-form select,
+  .issuance-form textarea {
+    width: 100%;
+    padding: 6px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .issuance-form button[type="submit"] {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .item-formset {
+    flex: 2;
+  }
+
+  .item-formset table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .item-formset th,
+  .item-formset td {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+
+  .item-formset th {
+    background-color: #007bff;
+    color: white;
+    text-align: left;
+  }
+
+  .item-formset td select,
+  .item-formset td input {
+    width: 100%;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  .item-formset button {
+    padding: 6px 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  #add-row {
+    margin-top: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  h2, h3 {
+    margin-bottom: 15px;
+  }
+</style>
+
+{% endblock %}
