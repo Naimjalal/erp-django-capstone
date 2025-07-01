@@ -1,7 +1,11 @@
 from django.db import models 
-from employees.models import Store
+from employees.models import Store,Employee
+from users.models import User
 from django.conf import settings
-from django.contrib.auth.models import User
+
+
+
+
 # Create your models here.
 class Inventory_Category(models.Model):
     category_name = models.CharField(max_length=100,unique=True)
@@ -76,6 +80,51 @@ class StockReceiptItem(models.Model):
         
     def __str__(self):
         return f"{self.item.item_name} - Qty: {self.quantity_received}"
+    
+class ItemIssuance(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    issued_by = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,null=True,related_name='issued_items')
+    issue_date = models.DateField()
+    shift = models.CharField(max_length=20)
+    is_emergency = models.BooleanField(default=False)
+    card_verified = models.BooleanField(default=False)
+    verification_time = models.DateTimeField(null=True, blank=True)
+    note = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Issuance to {self.employee} on {self.issue_date}"
+
+
+class ItemIssuanceItem(models.Model):
+    issuance = models.ForeignKey(ItemIssuance, on_delete=models.CASCADE, related_name='items')
+    item = models.ForeignKey(Inventory_Item, on_delete=models.CASCADE)
+    size_variant = models.ForeignKey(SizeVariant, on_delete=models.SET_NULL, null=True, blank=True)
+    quantity = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.quantity} x {self.item} for Issuance #{self.issuance.id}"
+
+class ItemReturn(models.Model):
+    issuance = models.OneToOneField(ItemIssuance, on_delete=models.CASCADE)
+    returned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    return_date = models.DateTimeField(auto_now_add=True)
+    card_verified = models.BooleanField(default=False)
+    verification_time = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Return for Issuance #{self.issuance.id}"
+
+class ItemReturnItem(models.Model):
+    return_record = models.ForeignKey(ItemReturn, on_delete=models.CASCADE)
+    item = models.ForeignKey(Inventory_Item, on_delete=models.CASCADE)
+    size_variant = models.ForeignKey(SizeVariant, on_delete=models.SET_NULL, null=True, blank=True)
+    quantity = models.PositiveIntegerField()
+    is_damaged = models.BooleanField(default=False)
+    damage_notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        size = f" - {self.size_variant.size_label}" if self.size_variant else ""
+        return f"Return: {self.quantity} x {self.item.item_name}{size}"
 
 
 
