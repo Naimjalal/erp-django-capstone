@@ -5,64 +5,105 @@
   <title>ERP System</title>
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      min-height: 100vh;
+    }
 
-<header>
-  <nav>
+    .sidebar {
+      width: 250px;
+      background-color: #1e2a38;
+      color: white;
+      padding: 20px;
+    }
+
+    .sidebar h3 {
+      font-size: 14px;
+      margin-top: 25px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 4px;
+      text-transform: uppercase;
+      color: #9ad1d4;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #cfd8dc;
+      text-decoration: none;
+      margin: 6px 0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .sidebar a:hover {
+      background-color: #294055;
+      color: white;
+    }
+
+    .logout-btn {
+      background-color: #b71c1c;
+      color: white;
+      border: none;
+      padding: 8px 10px;
+      margin-top: 20px;
+      width: 100%;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      padding: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
     <a href="{% url 'home' %}">Home</a>
 
     {% if user.is_authenticated %}
-
-      {# HR & Admin Access - Employee Management #}
       {% if user.role == 'hr' or user.role == 'admin' %}
-        <a href="{% url 'add_employee' %}">Add Employee</a>
+        <h3>Employees</h3>
+        <a href="{% url 'add_employee' %}">+ Add Employee</a>
         <a href="{% url 'list_employee' %}">Employee List</a>
         <a href="{% url 'inactive_employees' %}">Inactive Employees</a>
         <a href="{% url 'employee_search' %}">Search Employee</a>
       {% endif %}
 
-      {# Admin Only - Full Employee Control #}
-      {% if user.role == 'admin' %}
-        <a href="{% url 'inactive_employees' %}">Inactive Employees</a>
-        <a href="{% url 'employee_search' %}">Search Employee</a>
-      {% endif %}
-
-      {# Supervisor & Admin - Inventory Management #}
       {% if user.role == 'supervisor' or user.role == 'admin' %}
-        <a href="{% url 'add_inventory_category' %}">Add Category</a>
-        <a href="{% url 'add_inventory_item' %}">Add Item</a>
-        <a href="{% url 'add_size_variant' %}">Add Size Variant</a>
-        <a href="{% url 'add_stock_receipt' %}">Add Stock Receipt</a>
-        <a href="{% url 'stock_receipt_list' %}">All Stock Receipt</a>
-        <a href="{% url 'add_item_issuance' %}">Issue Items</a>
-        <a href="{% url 'return_items' %}">Return Items</a>
+        <h3>Inventory</h3>
+        <a href="{% url 'add_inventory_category' %}">+ Add Category</a>
+        <a href="{% url 'add_inventory_item' %}">+ Add Item</a>
+        <a href="{% url 'add_size_variant' %}">+ Add Size Variant</a>
+        <a href="{% url 'add_stock_receipt' %}">+ Add Stock Receipt</a>
+        <a href="{% url 'stock_receipt_list' %}">All Stock Receipts</a>
+        <a href="{% url 'add_item_issuance' %}">- Issue Items</a>
+        <a href="{% url 'return_items' %}">+ Return Items</a>
         <a href="{% url 'item_issuance_list' %}">Issued List</a>
         <a href="{% url 'return_list' %}">Returned List</a>
-
       {% endif %}
 
-      {# Common for all authenticated users #}
-      <span>Welcome, {{ user.username }}!</span>
-      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+      <span style="margin-top:20px;">Welcome, {{ user.username }}!</span>
+      <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
-        <button type="submit" style="background:none; border:none; color:white; text-decoration:underline; cursor:pointer;">Logout</button>
+        <button type="submit" class="logout-btn">Logout</button>
       </form>
 
     {% else %}
       <a href="{% url 'login' %}">Login</a>
     {% endif %}
-  </nav>
-</header>
+  </div>
 
-<main>
-  {% block content %}
-  {% endblock %}
-</main>
-
-<footer>
-  <p>© 2025 ERP System</p>
-</footer>
-
+  <div class="main-content">
+    {% block content %}
+    {% endblock %}
+  </div>
 </body>
 </html>
