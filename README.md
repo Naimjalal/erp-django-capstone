@@ -41,26 +41,31 @@
 ### **_Key Pages_**
 
 #### Home Page  
-![Image](Add it later)
+![Image](images/1.png)
 
-#### Add Stock Receipt Page  
-![Image](Add it later)
+#### Login Page  
+![Image](images/2.png)
+
+#### Add Employee Page  
+![Image](images/3.png)
+
+#### Employee List Page  
+![Image](images/4.png)
+
+#### Search Employee Page  
+![Image](images/5.png)
+
+#### Add Inventory Page  
+![Image](images/6.png)
 
 #### Size Variant Page  
-![Image](Add it later)
+![Image](images/7.png)
 
-#### Issue Items Page  
-![Image](Add it later)
+#### Issue Page  
+![Image](images/8.png)
 
-#### Return Items Page  
-![Image](Add it later)
-
-#### Return List Page  
-![Image](Add it later)
-
-#### Employee Management Page  
-![Image](Add it later)
-
+#### Return Item list Page  
+![Image](images/9.png)
 ---
 
 ### **_Future Updates_**
