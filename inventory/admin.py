@@ -9,7 +9,10 @@ from .models import (
     StockReceipt,
     StockReceiptItem,
     ItemIssuance,           
-    ItemIssuanceItem 
+    ItemIssuanceItem,
+    ItemReturn,
+    ItemReturnItem
+
     
 
 )
@@ -23,4 +26,7 @@ admin.site.register(SizeVariant)
 admin.site.register(StockReceipt)
 admin.site.register(StockReceiptItem)
 admin.site.register(ItemIssuance)         
-admin.site.register(ItemIssuanceItem) 
+admin.site.register(ItemIssuanceItem)
+admin.site.register(ItemReturn)
+admin.site.register(ItemReturnItem)
+

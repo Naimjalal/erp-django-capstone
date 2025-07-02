@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Returned Items</h2>
+
+{% for ret in returns %}
+  <div style="border: 1px solid #ccc; margin-bottom: 20px; padding: 10px;">
+    <p><strong>Return ID:</strong> {{ ret.id }}</p>
+    <p><strong>Employee:</strong> {{ ret.issuance.employee.employee_name }}</p>
+    <p><strong>Return Date:</strong> {{ ret.return_date }}</p>
+    <p><strong>Returned By:</strong> {{ ret.returned_by.username }}</p>
+
+    <table border="1" cellpadding="8" cellspacing="0">
+      <tr>
+        <th>Item</th>
+        <th>Size</th>
+        <th>Quantity Returned</th>
+      </tr>
+      {% for item in ret.itemreturnitem_set.all %}
+      <tr>
+        <td>{{ item.item.item_name }}</td>
+        <td>{% if item.size_variant %}{{ item.size_variant.size_label }}{% else %}-{% endif %}</td>
+        <td>{{ item.quantity }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% empty %}
+  <p>No returned items found.</p>
+{% endfor %}
+
+{% endblock %}

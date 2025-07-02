@@ -18,6 +18,8 @@ urlpatterns = [
     path('issuances/', views.item_issuance_list, name='item_issuance_list'),
     path('return-items/', views.return_items, name='return_items'),
     path('confirm-return/', views.confirm_return, name='confirm_return'),
+    path('returns/', views.return_list, name='return_list'),
+
 
 
 

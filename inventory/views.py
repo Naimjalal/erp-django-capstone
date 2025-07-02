@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import InventoryCategoryForm, InventoryItemForm, SizeVariantForm,StockReceiptForm, StockReceiptItemFormSet,ItemIssuanceForm, ItemIssuanceItemForm
 from .models import Inventory_Item,SizeVariant, StockReceipt, StockReceiptItem, Supplier,Inventory_Category,ItemIssuance,ItemIssuanceItem,ItemReturn, ItemReturnItem
-from django.db.models import Sum
+from django.db.models import Sum, Prefetch
 from collections import defaultdict
 from employees.models import Store,Employee
 from django.utils import timezone
@@ -71,18 +71,23 @@ def add_size_variant(request):
     grouped_variants = defaultdict(list)
 
     for variant in SizeVariant.objects.select_related('item'):
-        
+        # Total received
         total_received = StockReceiptItem.objects.filter(size_variant=variant).aggregate(
             total=Sum('quantity_received')
         )['total'] or 0
 
-        
+        # Total issued
         total_issued = ItemIssuanceItem.objects.filter(size_variant=variant).aggregate(
             total=Sum('quantity')
         )['total'] or 0
 
-        
-        calculated_current = total_received - total_issued
+        #  Total returned
+        total_returned = ItemReturnItem.objects.filter(size_variant=variant).aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
+
+        #  Updated current quantity
+        calculated_current = total_received - total_issued + total_returned
 
         if (
             variant.quantity_original != total_received or
@@ -92,7 +97,6 @@ def add_size_variant(request):
             variant.quantity_current = max(0, calculated_current)
             variant.save()
 
-        
         grouped_variants[variant.item].append({
             'variant': variant,
             'original_qty': variant.quantity_original,
@@ -269,9 +273,9 @@ def add_item_issuance(request):
                 size_variant.quantity_current = max(0, size_variant.quantity_current - quantity)
                 size_variant.save()
 
-        return redirect('item_issuance_list')  # ✅ success redirect
+        return redirect('item_issuance_list') 
 
-    # GET method → prepare form
+    
     item_data = {}
     for item in items:
         item_data.setdefault(item.category_id, []).append({
@@ -323,6 +327,7 @@ def return_items(request):
             issuances = ItemIssuance.objects.filter(
             employee_id=employee_id
             ).exclude(id__in=returned_issuance_ids).order_by('-issue_date')
+            
 
             for issuance in issuances:
                 for item in issuance.items.filter(item__is_returnable=True):
@@ -350,10 +355,16 @@ def confirm_return(request):
             messages.error(request, "No items selected for return.")
             return redirect('return_items')
 
-      
+        # Use the first issuance ID to create the return record
         first_issuance_id = request.POST.get(f'issuance_id_{return_item_ids[0]}')
         issuance = get_object_or_404(ItemIssuance, id=first_issuance_id)
 
+        # Prevent duplicate returns for the same issuance
+        if ItemReturn.objects.filter(issuance=issuance).exists():
+            messages.error(request, "These items have already been returned.")
+            return redirect('return_items')
+
+        # Create the return record
         item_return = ItemReturn.objects.create(
             issuance=issuance,
             returned_by=request.user,
@@ -361,22 +372,43 @@ def confirm_return(request):
             verification_time=None
         )
 
+        # Loop through selected return items
         for i in return_item_ids:
             item_id = request.POST.get(f'item_id_{i}')
-            size_variant_id = request.POST.get(f'size_variant_id_{i}') or None
+            size_variant_id = request.POST.get(f'size_variant_id_{i}')
             quantity = int(request.POST.get(f'quantity_{i}'))
 
+            
+
+            # Save the return item record
             ItemReturnItem.objects.create(
                 return_record=item_return,
                 item_id=item_id,
-                size_variant_id=size_variant_id,
+                size_variant_id=size_variant_id if size_variant_id else None,
                 quantity=quantity
             )
 
+            # Update current quantity of the size variant
             if size_variant_id:
-                size_variant = SizeVariant.objects.get(id=size_variant_id)
-                size_variant.quantity_current += quantity
-                size_variant.save()
+                try:
+                    size_variant = SizeVariant.objects.get(id=int(size_variant_id))
+                    size_variant.quantity_current += quantity
+                    size_variant.save()
+                except SizeVariant.DoesNotExist:
+                    continue  # Skip if not found
 
-        messages.success(request, "Items returned successfully.")
-        return redirect('item_issuance_list')
+        # messages.success(request, "Items returned successfully.")
+        return redirect('return_list')
+    
+@login_required
+def return_list(request):
+    returns = ItemReturn.objects.select_related(
+        'issuance', 'returned_by'
+    ).prefetch_related(
+        Prefetch('itemreturnitem_set', queryset=ItemReturnItem.objects.select_related('item', 'size_variant'))
+    ).order_by('-return_date')
+
+    return render(request, 'inventory/return_list.html', {
+        'returns': returns
+    })
+
